@@ -52,7 +52,7 @@ class SensorFlow(BaseFlow):
             except:
                 current.card.append(Markdown(f"*Previous successful runs not found*"))
                 prev = None
-        self.value = self.query()
+        [(self.value,)] = self.query_snowflake(template='sensor', card=True)
         print(f"Previous value {prev}, new value {self.value}")
         if self.value == prev:
             print("no changes")
@@ -69,15 +69,6 @@ class SensorFlow(BaseFlow):
                 )
             )
         self.next(self.end)
-
-    def query(self):
-        current.card.append(Markdown(f"## 🛢️ Executing SQL"))
-        current.card.append(Markdown(f"{self.flowconfig.sensor.sql}"))
-        t = time.time()
-        [(res,)] = self.query_snowflake(template='sensor')
-        secs = int(1000 * (time.time() - t))
-        current.card.append(Markdown(f"Query finished in {secs}ms"))
-        return res
 
     @step
     def end(self):
