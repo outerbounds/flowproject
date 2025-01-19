@@ -1,0 +1,21 @@
+
+# @project name
+project_name = "demo_project"
+
+[data]
+# integration type
+type = "snowflake"
+# integration name
+integration = "weather-test"
+
+[sensor]
+# run the sensor every `frequency` minutes
+cron_schedule = "*/30 * * * *"
+
+# [OPTIONAL] instead of using `@trigger_on_finish`,
+# create an explicit event with this name
+event_name = ""
+
+# [OPTIONAL] supply the SQL response under this key
+# in the event payload
+payload_key = ""
