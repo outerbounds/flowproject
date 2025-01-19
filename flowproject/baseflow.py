@@ -25,6 +25,12 @@ class BaseFlow(FlowSpec):
             pass
 
     def query_snowflake(self, sql=None, template=None, card=False):
+        if card and hasattr(current, 'card'):
+            def _out(txt):
+                current.card.append(Markdown(txt))
+        else:
+            def _out(txt):
+                pass
 
         if template:
             if isinstance(template, tuple):
@@ -35,9 +41,9 @@ class BaseFlow(FlowSpec):
 
             with open(f'sql/{fname}.sql') as f:
                 sql = (f.read(), args) if args else f.read()
-
-        current.card.append(Markdown(f"## 🛢️ Executing SQL"))
-        current.card.append(Markdown(f"{sql}"))
+        
+        _out(f"## 🛢️ Executing SQL")
+        _out(f"{sql}")
         
         from metaflow import Snowflake
         with Snowflake(integration=self.flowconfig.data.integration) as cn:
@@ -48,5 +54,5 @@ class BaseFlow(FlowSpec):
                 else:
                     cur.execute(sql)
                 secs = int(1000 * (time.time() - t))
-                current.card.append(Markdown(f"Query finished in {secs}ms"))
+                _out(f"Query finished in {secs}ms")
                 return list(cur.fetchall())
