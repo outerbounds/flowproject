@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# Get the current branch name
+current_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+
+# Check if the command succeeded and a branch name was retrieved
+if [ $? -ne 0 ]; then
+    echo "Not a Git repository -> not using --branch"
+    branch=""
+else
+    # Check if the current branch is 'main' or 'master'
+    if [ "$current_branch" == "main" ] || [ "$current_branch" == "master" ]; then
+        echo "Deploying from the main/master branch -> not using --branch"
+        branch=""
+    else
+        echo "Deploying to $current_branch"
+        branch="--branch $current_branch"
+    fi
+fi
+
+for flow in *flow.py;
+do
+    python $flow $branch argo-workflows create
+done
