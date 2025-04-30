@@ -1,12 +1,36 @@
+### flowproject.toml ###
+### This file drives configuration options in sensorflow.py, ###
+### by way of the file /flowproject/baseflow.py interface.   ###
 
 # @project name
 project_name = "demo_project"
 
 [data]
-# integration type
-type = "snowflake"
-# integration name
-integration = "weather-test"
+# Get started in Outerbounds UI /Integrations tab. 
+# Set the type integration type here. Choose from [Snowflake, S3].
+# The type changes downstream options - will show below. 
+### For Snowflake, set the type and the integration name.
+# type = "snowflake"
+# integration = "weather-test"
+### For S3, set the type and the IAM role arn.
+type = "s3"
+role = "arn:aws:iam::150919491992:role/demo-s3-sensorflow"
+
+[data_kwargs]
+# This section is data.type specific args.
+# For example a sql "template" for the baseflow's _query_snowflake, or S3 bucket params.
+# New section for S3-specific configuration
+### For Snowflake
+# template = "forecast"
+# template = "sensor"
+### For S3
+bucket = "s3://demo-sensorflow"
+key = "LICENSE"
+# What to check for changes: 
+    # "files_metadata": when the file metadata changes in a directory.
+    # "file_modified_ts": when a specific file is modified in any way.
+    # "file_size": when a specific file's size is changed.
+check_mode = "file_size"
 
 [sensor]
 # run the sensor every `frequency` minutes

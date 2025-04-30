@@ -1,16 +1,12 @@
 from datetime import datetime
 from itertools import islice
-import time
 
 from metaflow import (
-    FlowSpec,
     step,
     config_expr,
     project,
     schedule,
     Parameter,
-    Config,
-    conda,
     card,
     Flow,
     current,
@@ -28,12 +24,29 @@ class SkipTrigger(Exception):
 @project(name=config_expr("flowconfig.project_name"))
 @schedule(cron=config_expr("flowconfig.sensor.cron_schedule"))
 class SensorFlow(BaseFlow):
+
+    """
+    The SensorFlow will run in the Outerbounds dataplane.
+    It acts like a gateway to the Outerbounds event bus. 
+    It is an implementation of the BaseFlow in /flowproject/baseflow.py. 
+
+    Before running this flow, check:
+        1. /flowproject.toml: A configuration file to flip switches in this workflow.
+        2. /flowproject/baseflow.py: An abstract class this flow inherits the self.query operation from.
+    """
+
     force = Parameter("force-trigger", default=False)
 
     @card(type="blank")
     @snowflake
     @step
     def start(self):
+        """
+        Set up cards for monitoring.
+        Query the database metadata, determine whether the self.trigger should be run.
+        The contract is that self.query returns a single object to compare run over run of this flow.
+        if self.value == prev --> no change --> no events/trigger. else --> change --> trigger.
+        """
         if self.force:
             current.card.append(Markdown("*Force is true - ignoring previous value*"))
             prev = None
@@ -52,7 +65,17 @@ class SensorFlow(BaseFlow):
             except:
                 current.card.append(Markdown(f"*Previous successful runs not found*"))
                 prev = None
-        [(self.value,)] = self.query_snowflake(template='sensor', card=True)
+        # [(self.value,)] = self.query(
+        #     storage_type=self.flowconfig.data.type,
+        #     kwargs=self.flowconfig.data_kwargs,
+        #     card=True
+        # )
+        self.value = self.query(
+            storage_type=self.flowconfig.data.type,
+            kwargs=self.flowconfig.data_kwargs,
+            card=True
+        )
+        print(self.value)
         print(f"Previous value {prev}, new value {self.value}")
         if self.value == prev:
             print("no changes")
@@ -72,6 +95,7 @@ class SensorFlow(BaseFlow):
 
     @step
     def end(self):
+        "Dispatch the event."
         event_name = self.flowconfig.sensor.get("event_name")
         key = self.flowconfig.sensor.get("payload_key", "value")
         if event_name:
