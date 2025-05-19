@@ -14,8 +14,8 @@ from metaflow import (
 from metaflow.cards import Markdown
 from metaflow.integrations import ArgoEvent
 
-from flowproject import toml_parser, BaseFlow, snowflake
-
+# custom module
+from flowproject import BaseFlow #, snowflake
 
 class SkipTrigger(Exception):
     pass
@@ -37,7 +37,7 @@ class SensorFlow(BaseFlow):
     force = Parameter("force-trigger", default=False)
 
     @card(type="blank")
-    @snowflake
+    # @snowflake
     @step
     def start(self):
         """
@@ -46,6 +46,7 @@ class SensorFlow(BaseFlow):
         The contract is that self.query returns a single object to compare run over run of this flow.
         if self.value == prev --> no change --> no events/trigger. else --> change --> trigger.
         """
+
         if self.force:
             current.card.append(Markdown("*Force is true - ignoring previous value*"))
             prev = None
@@ -64,20 +65,24 @@ class SensorFlow(BaseFlow):
             except:
                 current.card.append(Markdown(f"*Previous successful runs not found*"))
                 prev = None
+
+        # cleaner for Snowflake
         # [(self.value,)] = self.query(
-        #     storage_type=self.flowconfig.data.type,
+        #     storage_type=self.flowconfig.data.storage_type,
         #     kwargs=self.flowconfig.data_kwargs,
         #     card=True
         # )
+
+        # cleaner for s3
         self.value = self.query(
-            storage_type=self.flowconfig.data.type,
+            storage_type=self.flowconfig.data.storage_type,
             kwargs=self.flowconfig.data_kwargs,
             card=True,
         )
-        print(self.value)
-        print(f"Previous value {prev}, new value {self.value}")
+
+        # print(f"Previous value {prev}, new value {self.value}")
         if self.value == prev:
-            print("no changes")
+            print("No changes.")
             self.trigger = False
             current.card.append(
                 Markdown(f"## 🔄 No changes\n\nThe value is still `{self.value}`")

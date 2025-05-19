@@ -7,19 +7,23 @@ project_name = "demo_project"
 
 [data]
 # Get started in Outerbounds UI /Integrations tab. 
-# Set the type integration type here. Choose from [Snowflake, S3].
-# The type changes downstream options - will show below. 
+# Set the integration storage_type here. Choose from [snowflake, s3].
+    # snowflake
+        # integration
+    # s3
+        # role
+# The type changes downstream options in data_kwargs too - will show below. 
 
 ### For Snowflake, set the type and the integration name.
-# type = "snowflake"
+# storage_type = "snowflake"
 # integration = "weather-test"
 
 ### For S3, set the type and the IAM role arn.
-type = "s3"
+storage_type = "s3"
 role = "..."
 
 [data_kwargs]
-# This section is data.type specific args.
+# This section is data.storage_type specific args.
 # For example a sql "template" for the baseflow's _query_snowflake, or S3 bucket params.
 # Required arguments by data.type:
     # snowflake

@@ -16,13 +16,13 @@ class StarterFlow(BaseFlow):
         if self.flowconfig.sensor.event_name == "":
             naughty_points += 1
             print("Event name not specified! Experiment with flowproject.toml.")
-        if self.flowconfig.data.type not in ["snowflake", "s3"]:
+        if self.flowconfig.data.storage_type not in ["snowflake", "s3"]:
             naughty_points += 5
             print(
                 "Woah there, partner. This template only supports Snowflake and S3 for now."
             )
         if (
-            self.flowconfig.data.type == "snowflake"
+            self.flowconfig.data.storage_type == "snowflake"
             and "template" not in self.flowconfig.data_kwargs
         ):
             naughty_points += 3
@@ -30,7 +30,7 @@ class StarterFlow(BaseFlow):
                 "When you run the Snowflake SensorFlow, you need a SQL query defined in /sql, and to reference that in the data_kwargs."
             )
         if (
-            self.flowconfig.data.type == "s3"
+            self.flowconfig.data.storage_type == "s3"
             and "bucket" not in self.flowconfig.data_kwargs
         ):
             naughty_points += 3
@@ -38,7 +38,7 @@ class StarterFlow(BaseFlow):
                 "When you run the S3 SensorFlow, you need a bucket defined in the data_kwargs.bucket variable."
             )
         if (
-            self.flowconfig.data.type == "s3"
+            self.flowconfig.data.storage_type == "s3"
             and "key" not in self.flowconfig.data_kwargs
         ):
             naughty_points += 3
@@ -54,7 +54,7 @@ class StarterFlow(BaseFlow):
             )
 
         self.value = self.query(
-            storage_type=self.flowconfig.data.type, kwargs=self.flowconfig.data_kwargs
+            storage_type=self.flowconfig.data.storage_type, kwargs=self.flowconfig.data_kwargs
         )
 
         print(f"Query result: {self.value}")
