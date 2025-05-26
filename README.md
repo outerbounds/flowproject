@@ -11,7 +11,7 @@ Features of this structure to consider:
     - S3
 - SQL and Python are seamlessly mixed.
 - Flow inheritance is used to define a base flow, a template for "application" flows.
-- Config-driven workflows enable workflow code to stay fixed, and clarifying the relationship between workflows and research/business code.
+- Config-driven workflows enable workflow code to stay fixed, and clarifies the relationship between workflows and research/business code.
 - CI/CD approach to link workflow namespaces and code branches.
 
 ### Applying the scaffold with the `SensorFlow`
@@ -42,7 +42,7 @@ A flow that sends events into the Outerbounds ecosystem from external storage pl
 Currently, Snowflake and S3 are supported. See [use cases](#use-cases) to understand how to use each in detail. 
 
 ## `deploy` script
-A `deploy` script to use manually or in CI, that deploys workflows ending in the root directory matching `*.flow.py` to Argo Workflows. [Metaflow `branches`](https://docs.metaflow.org/production/coordinating-larger-metaflow-projects#custom-branches) are linked to GitHub branches, meaning code branches are now coupled to workflow namespaces. This pattern connects workflow changes with code changes, facilitating observability and debugging. 
+A `deploy` script to use manually or in CI, that deploys workflows files in the root directory matching `*.flow.py` to Argo Workflows. [Metaflow `branches`](https://docs.metaflow.org/production/coordinating-larger-metaflow-projects#custom-branches) are linked to GitHub branches, meaning code branches are now coupled to workflow namespaces. This pattern connects workflow changes with code changes, facilitating observability and debugging. 
 
 ## `SensorFlow` use cases
 
